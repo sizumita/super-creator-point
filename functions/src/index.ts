@@ -30,10 +30,14 @@ async function log(data: any) {
 
 async function getPoint(userName: string): Promise<number> {
     const document = await admin.firestore().collection("users").doc(userName).get();
-    let point = 0;
+    let point = 100;
     if (document.exists) {
         const data = document.data();
         point = data!.point;
+    } else {
+        await admin.firestore().collection("users").doc(userName).set({
+            point,
+        }, {merge: true});
     }
     return point;
 }
