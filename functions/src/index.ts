@@ -13,6 +13,17 @@ admin.initializeApp();
 // });
 
 
+const MENTORS = [
+    "nishio",
+    "taizan",
+    "shoya140",
+    "teramotodaiki",
+    "yuukai",
+    "yasulab",
+    "kakeru",
+];
+
+
 async function log(data: any) {
     await admin.firestore().collection("logs").add(data);
 }
@@ -47,6 +58,9 @@ async function givePoint(fromUser: string, toUser: string, amount: number) {
 
 
 async function givePointByMentor(fromUser: string, toUser: string, amount: number): Promise<string> {
+    if (amount <= 0 || amount > 100) {
+        return "1~100ポイントの間で指定してください。";
+    }
     await givePoint(fromUser, toUser, amount);
     return `@${toUser} さんに ${amount}コインを贈与しました！`;
 }
@@ -56,6 +70,9 @@ async function givePointByUser(fromUser: string, toUser: string, amount: number)
     const point = await getPoint(fromUser);
     if (point < amount) {
         return `ポイントが足りません (${point} < ${amount})`;
+    }
+    if (amount <= 0 || amount > 100) {
+        return "1~100ポイントの間で指定してください。";
     }
     await admin.firestore().collection("users").doc(fromUser).update({
         point: admin.firestore.FieldValue.increment(-amount),
@@ -69,7 +86,7 @@ async function givePointByUser(fromUser: string, toUser: string, amount: number)
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function isMentor(userName: string): boolean {
     // 最初なのでこう
-    return true;
+    return MENTORS.includes(userName);
 }
 
 
